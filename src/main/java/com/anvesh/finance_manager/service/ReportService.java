@@ -16,19 +16,17 @@ public class ReportService {
 
     // MONTHLY REPORT
     public Map<String, Object> generateMonthlyReport(
-
             int year,
             int month
     ) {
 
         List<Transaction> transactions =
-                transactionService
-                        .getAllTransactions();
+                transactionService.getAllTransactions();
 
-        Map<String, Double> incomeMap =
+        Map<String, Double> categoryIncome =
                 new HashMap<>();
 
-        Map<String, Double> expenseMap =
+        Map<String, Double> categoryExpense =
                 new HashMap<>();
 
         double totalIncome = 0;
@@ -39,9 +37,11 @@ public class ReportService {
             LocalDate date =
                     transaction.getDate();
 
-            if (date.getYear() == year
-                    &&
-                    date.getMonthValue() == month) {
+            if (
+                    date.getYear() == year
+                            &&
+                            date.getMonthValue() == month
+            ) {
 
                 String category =
                         transaction.getCategory()
@@ -54,29 +54,33 @@ public class ReportService {
                 double amount =
                         transaction.getAmount();
 
-                if (type.equalsIgnoreCase("INCOME")) {
-
-                    incomeMap.put(
-                            category,
-                            incomeMap.getOrDefault(
-                                    category,
-                                    0.0
-                            ) + amount
-                    );
+                if (
+                        type.equalsIgnoreCase(
+                                "INCOME"
+                        )
+                ) {
 
                     totalIncome += amount;
 
-                } else {
-
-                    expenseMap.put(
+                    categoryIncome.put(
                             category,
-                            expenseMap.getOrDefault(
+                            categoryIncome.getOrDefault(
                                     category,
                                     0.0
                             ) + amount
                     );
 
+                } else {
+
                     totalExpense += amount;
+
+                    categoryExpense.put(
+                            category,
+                            categoryExpense.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
                 }
             }
         }
@@ -88,19 +92,31 @@ public class ReportService {
 
         report.put("year", year);
 
+        // TOTALS
         report.put(
                 "totalIncome",
-                incomeMap
+                totalIncome
         );
 
         report.put(
-                "totalExpenses",
-                expenseMap
+                "totalExpense",
+                totalExpense
         );
 
         report.put(
                 "netSavings",
                 totalIncome - totalExpense
+        );
+
+        // CATEGORY BREAKDOWN
+        report.put(
+                "incomeBreakdown",
+                categoryIncome
+        );
+
+        report.put(
+                "expenseBreakdown",
+                categoryExpense
         );
 
         return report;
@@ -112,13 +128,12 @@ public class ReportService {
     ) {
 
         List<Transaction> transactions =
-                transactionService
-                        .getAllTransactions();
+                transactionService.getAllTransactions();
 
-        Map<String, Double> incomeMap =
+        Map<String, Double> categoryIncome =
                 new HashMap<>();
 
-        Map<String, Double> expenseMap =
+        Map<String, Double> categoryExpense =
                 new HashMap<>();
 
         double totalIncome = 0;
@@ -129,7 +144,9 @@ public class ReportService {
             LocalDate date =
                     transaction.getDate();
 
-            if (date.getYear() == year) {
+            if (
+                    date.getYear() == year
+            ) {
 
                 String category =
                         transaction.getCategory()
@@ -142,29 +159,33 @@ public class ReportService {
                 double amount =
                         transaction.getAmount();
 
-                if (type.equalsIgnoreCase("INCOME")) {
-
-                    incomeMap.put(
-                            category,
-                            incomeMap.getOrDefault(
-                                    category,
-                                    0.0
-                            ) + amount
-                    );
+                if (
+                        type.equalsIgnoreCase(
+                                "INCOME"
+                        )
+                ) {
 
                     totalIncome += amount;
 
-                } else {
-
-                    expenseMap.put(
+                    categoryIncome.put(
                             category,
-                            expenseMap.getOrDefault(
+                            categoryIncome.getOrDefault(
                                     category,
                                     0.0
                             ) + amount
                     );
 
+                } else {
+
                     totalExpense += amount;
+
+                    categoryExpense.put(
+                            category,
+                            categoryExpense.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
                 }
             }
         }
@@ -174,19 +195,31 @@ public class ReportService {
 
         report.put("year", year);
 
+        // TOTALS
         report.put(
                 "totalIncome",
-                incomeMap
+                totalIncome
         );
 
         report.put(
-                "totalExpenses",
-                expenseMap
+                "totalExpense",
+                totalExpense
         );
 
         report.put(
                 "netSavings",
                 totalIncome - totalExpense
+        );
+
+        // CATEGORY BREAKDOWN
+        report.put(
+                "incomeBreakdown",
+                categoryIncome
+        );
+
+        report.put(
+                "expenseBreakdown",
+                categoryExpense
         );
 
         return report;
