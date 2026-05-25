@@ -18,6 +18,9 @@ public class Goal {
 
     private Double targetAmount;
 
+    // NEW FIELD
+    private Double savedAmount;
+
     private LocalDate targetDate;
 
     // GOAL CREATION DATE
