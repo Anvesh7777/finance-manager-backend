@@ -19,6 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // REGISTER USER
     @PostMapping("/register")
     public User registerUser(
             @RequestBody User user
@@ -27,6 +28,7 @@ public class UserController {
         return userService.registerUser(user);
     }
 
+    // LOGIN USER
     @PostMapping("/login")
     public LoginResponseDTO login(
             @RequestBody LoginRequestDTO request
@@ -35,13 +37,15 @@ public class UserController {
         return userService.login(request);
     }
 
+    // GET ALL USERS
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
 
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
+    // GET USER BY ID
+    @GetMapping("/id/{id}")
     public UserResponseDTO getUserById(
             @PathVariable Long id
     ) {
