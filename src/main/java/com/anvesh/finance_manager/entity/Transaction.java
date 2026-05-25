@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Table(name = "transactions")
 public class Transaction {
 
     @Id
@@ -20,5 +21,10 @@ public class Transaction {
     private String description;
 
     @ManyToOne
+    @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

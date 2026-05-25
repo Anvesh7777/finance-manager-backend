@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationManager;
 
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,7 +37,9 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
+
             AuthenticationConfiguration config
+
     ) throws Exception {
 
         return config.getAuthenticationManager();
@@ -43,31 +47,50 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
+
             HttpSecurity http
+
     ) throws Exception {
 
         http
+
                 .cors(cors -> {})
 
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // PUBLIC ROUTES
                         .requestMatchers(
+
                                 "/api/users/register",
+
                                 "/api/users/login"
+
                         ).permitAll()
 
-                        .anyRequest().authenticated()
+                        // ALLOW PREFLIGHT
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**"
+                        ).permitAll()
+
+                        // SECURED ROUTES
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .sessionManagement(session ->
+
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 );
 
         http.addFilterBefore(
+
                 jwtFilter,
+
                 UsernamePasswordAuthenticationFilter.class
         );
 

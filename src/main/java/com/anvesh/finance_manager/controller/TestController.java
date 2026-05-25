@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @GetMapping("/")
-    public String home() {
+    @GetMapping("/api/health")
+    public String health() {
+
         return "Finance Manager Backend Running!";
     }
 }

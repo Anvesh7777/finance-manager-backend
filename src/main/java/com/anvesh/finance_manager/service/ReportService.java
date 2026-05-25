@@ -1,12 +1,12 @@
 package com.anvesh.finance_manager.service;
 
 import com.anvesh.finance_manager.entity.Transaction;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class ReportService {
@@ -14,46 +14,179 @@ public class ReportService {
     @Autowired
     private TransactionService transactionService;
 
-    public Map<String, Object> generateReport() {
+    // MONTHLY REPORT
+    public Map<String, Object> generateMonthlyReport(
+
+            int year,
+            int month
+    ) {
 
         List<Transaction> transactions =
-                transactionService.getAllTransactions();
+                transactionService
+                        .getAllTransactions();
 
-        double income = 0;
-        double expense = 0;
+        Map<String, Double> incomeMap =
+                new HashMap<>();
 
-        for (Transaction t : transactions) {
+        Map<String, Double> expenseMap =
+                new HashMap<>();
 
-            if (
-                    t.getCategory()
-                            .getType()
-                            .equals("INCOME")
-            ) {
+        double totalIncome = 0;
+        double totalExpense = 0;
 
-                income += t.getAmount();
+        for (Transaction transaction : transactions) {
 
-            } else {
+            LocalDate date =
+                    transaction.getDate();
 
-                expense += t.getAmount();
+            if (date.getYear() == year
+                    &&
+                    date.getMonthValue() == month) {
+
+                String category =
+                        transaction.getCategory()
+                                .getName();
+
+                String type =
+                        transaction.getCategory()
+                                .getType();
+
+                double amount =
+                        transaction.getAmount();
+
+                if (type.equalsIgnoreCase("INCOME")) {
+
+                    incomeMap.put(
+                            category,
+                            incomeMap.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
+
+                    totalIncome += amount;
+
+                } else {
+
+                    expenseMap.put(
+                            category,
+                            expenseMap.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
+
+                    totalExpense += amount;
+                }
             }
         }
 
         Map<String, Object> report =
                 new HashMap<>();
 
+        report.put("month", month);
+
+        report.put("year", year);
+
         report.put(
                 "totalIncome",
-                income
+                incomeMap
         );
 
         report.put(
-                "totalExpense",
-                expense
+                "totalExpenses",
+                expenseMap
         );
 
         report.put(
                 "netSavings",
-                income - expense
+                totalIncome - totalExpense
+        );
+
+        return report;
+    }
+
+    // YEARLY REPORT
+    public Map<String, Object> generateYearlyReport(
+            int year
+    ) {
+
+        List<Transaction> transactions =
+                transactionService
+                        .getAllTransactions();
+
+        Map<String, Double> incomeMap =
+                new HashMap<>();
+
+        Map<String, Double> expenseMap =
+                new HashMap<>();
+
+        double totalIncome = 0;
+        double totalExpense = 0;
+
+        for (Transaction transaction : transactions) {
+
+            LocalDate date =
+                    transaction.getDate();
+
+            if (date.getYear() == year) {
+
+                String category =
+                        transaction.getCategory()
+                                .getName();
+
+                String type =
+                        transaction.getCategory()
+                                .getType();
+
+                double amount =
+                        transaction.getAmount();
+
+                if (type.equalsIgnoreCase("INCOME")) {
+
+                    incomeMap.put(
+                            category,
+                            incomeMap.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
+
+                    totalIncome += amount;
+
+                } else {
+
+                    expenseMap.put(
+                            category,
+                            expenseMap.getOrDefault(
+                                    category,
+                                    0.0
+                            ) + amount
+                    );
+
+                    totalExpense += amount;
+                }
+            }
+        }
+
+        Map<String, Object> report =
+                new HashMap<>();
+
+        report.put("year", year);
+
+        report.put(
+                "totalIncome",
+                incomeMap
+        );
+
+        report.put(
+                "totalExpenses",
+                expenseMap
+        );
+
+        report.put(
+                "netSavings",
+                totalIncome - totalExpense
         );
 
         return report;

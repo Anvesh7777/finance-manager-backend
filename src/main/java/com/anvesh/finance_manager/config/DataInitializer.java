@@ -1,7 +1,6 @@
 package com.anvesh.finance_manager.config;
 
 import com.anvesh.finance_manager.entity.Category;
-import com.anvesh.finance_manager.repository.CategoryRepository;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

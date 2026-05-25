@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -15,33 +16,80 @@ public class JwtService {
     private static final String SECRET =
             "mySuperSecretKeymySuperSecretKeymySuperSecretKey";
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private final Key key =
+            Keys.hmacShaKeyFor(
+                    SECRET.getBytes()
+            );
 
-    public String generateToken(String email) {
+    // GENERATE TOKEN
+    public String generateToken(
+            String email
+    ) {
 
         return Jwts.builder()
+
                 .setSubject(email)
+
                 .setIssuedAt(new Date())
+
                 .setExpiration(
-                        new Date(System.currentTimeMillis() + 86400000)
+                        new Date(
+                                System.currentTimeMillis()
+                                        + 1000 * 60 * 60 * 24
+                        )
                 )
-                .signWith(key, SignatureAlgorithm.HS256)
+
+                .signWith(
+                        key,
+                        SignatureAlgorithm.HS256
+                )
+
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    // EXTRACT EMAIL
+    public String extractEmail(
+            String token
+    ) {
 
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getSubject();
+        return getClaims(token)
+                .getSubject();
     }
 
-    public boolean isTokenValid(String token, String email) {
+    // VALIDATE TOKEN
+    public boolean isTokenValid(
+            String token,
+            String email
+    ) {
 
-        return extractEmail(token).equals(email);
+        return email.equals(
+                extractEmail(token)
+        ) && !isTokenExpired(token);
+    }
+
+    // TOKEN EXPIRY CHECK
+    private boolean isTokenExpired(
+            String token
+    ) {
+
+        return getClaims(token)
+                .getExpiration()
+                .before(new Date());
+    }
+
+    // GET CLAIMS
+    private Claims getClaims(
+            String token
+    ) {
+
+        return Jwts.parserBuilder()
+
+                .setSigningKey(key)
+
+                .build()
+
+                .parseClaimsJws(token)
+
+                .getBody();
     }
 }

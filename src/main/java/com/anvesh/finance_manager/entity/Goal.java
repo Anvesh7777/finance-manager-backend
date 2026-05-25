@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Table(name = "goals")
 public class Goal {
 
     @Id
@@ -18,4 +19,12 @@ public class Goal {
     private Double targetAmount;
 
     private LocalDate targetDate;
+
+    // GOAL CREATION DATE
+    private LocalDate startDate;
+
+    // USER RELATION
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
