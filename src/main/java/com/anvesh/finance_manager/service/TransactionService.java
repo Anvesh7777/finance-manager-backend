@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
 
-    // GET CURRENT LOGGED-IN USER
+    // GET CURRENT LOGGED IN USER
     private User getCurrentUser() {
 
         Authentication authentication =
@@ -45,16 +46,22 @@ public class TransactionService {
             Transaction transaction
     ) {
 
+        LocalDate indiaToday =
+                LocalDate.now(
+                        ZoneId.of("Asia/Kolkata")
+                );
+
         // FUTURE DATE VALIDATION
         if (transaction.getDate()
-                .isAfter(LocalDate.now())) {
+                .isAfter(indiaToday)) {
 
             throw new RuntimeException(
                     "Future date is not allowed"
             );
         }
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         transaction.setUser(currentUser);
 
@@ -65,7 +72,8 @@ public class TransactionService {
     // GET ALL USER TRANSACTIONS
     public List<Transaction> getAllTransactions() {
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         return transactionRepository
                 .findByUser(currentUser);
@@ -78,7 +86,8 @@ public class TransactionService {
             LocalDate endDate
     ) {
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         return transactionRepository
                 .findByUserAndDateBetweenOrderByDateDesc(
@@ -91,7 +100,8 @@ public class TransactionService {
     // DELETE TRANSACTION
     public void deleteTransaction(Long id) {
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         Transaction transaction =
                 transactionRepository
@@ -111,8 +121,9 @@ public class TransactionService {
             );
         }
 
-        transactionRepository
-                .delete(transaction);
+        transactionRepository.delete(
+                transaction
+        );
     }
 
     // UPDATE TRANSACTION
@@ -122,7 +133,8 @@ public class TransactionService {
             Transaction updatedTransaction
     ) {
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         Transaction transaction =
                 transactionRepository
@@ -142,9 +154,14 @@ public class TransactionService {
             );
         }
 
+        LocalDate indiaToday =
+                LocalDate.now(
+                        ZoneId.of("Asia/Kolkata")
+                );
+
         // DATE VALIDATION
         if (updatedTransaction.getDate()
-                .isAfter(LocalDate.now())) {
+                .isAfter(indiaToday)) {
 
             throw new RuntimeException(
                     "Future date is not allowed"
