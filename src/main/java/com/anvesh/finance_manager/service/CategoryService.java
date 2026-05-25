@@ -2,6 +2,8 @@ package com.anvesh.finance_manager.service;
 
 import com.anvesh.finance_manager.entity.Category;
 import com.anvesh.finance_manager.entity.User;
+
+import com.anvesh.finance_manager.repository.CategoryRepository;
 import com.anvesh.finance_manager.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package com.anvesh.finance_manager.config;
 
 import com.anvesh.finance_manager.entity.Category;
+import com.anvesh.finance_manager.repository.CategoryRepository;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,10 @@ public class DataInitializer {
                         "INCOME"
                 );
 
+                salary.setDefaultCategory(
+                        true
+                );
+
                 categoryRepository.save(
                         salary
                 );
@@ -44,6 +49,10 @@ public class DataInitializer {
 
                 freelance.setType(
                         "INCOME"
+                );
+
+                freelance.setDefaultCategory(
+                        true
                 );
 
                 categoryRepository.save(
@@ -61,6 +70,10 @@ public class DataInitializer {
                         "EXPENSE"
                 );
 
+                food.setDefaultCategory(
+                        true
+                );
+
                 categoryRepository.save(
                         food
                 );
@@ -74,6 +87,10 @@ public class DataInitializer {
 
                 rent.setType(
                         "EXPENSE"
+                );
+
+                rent.setDefaultCategory(
+                        true
                 );
 
                 categoryRepository.save(
@@ -91,6 +108,10 @@ public class DataInitializer {
                         "EXPENSE"
                 );
 
+                entertainment.setDefaultCategory(
+                        true
+                );
+
                 categoryRepository.save(
                         entertainment
                 );
@@ -104,6 +125,10 @@ public class DataInitializer {
 
                 transport.setType(
                         "EXPENSE"
+                );
+
+                transport.setDefaultCategory(
+                        true
                 );
 
                 categoryRepository.save(
