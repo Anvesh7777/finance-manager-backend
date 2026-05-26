@@ -44,51 +44,49 @@ public class JwtAuthenticationFilter
 
     ) throws ServletException, IOException {
 
+        String path =
+                request.getServletPath();
+
+        // PUBLIC ROUTES
+        if (
+
+                path.equals("/api/users/login")
+                        ||
+                        path.equals("/api/users/register")
+
+        ) {
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
+            return;
+        }
+
+        final String authHeader =
+                request.getHeader(
+                        "Authorization"
+                );
+
+        // NO TOKEN
+        if (
+                authHeader == null
+                        ||
+                        !authHeader.startsWith(
+                                "Bearer "
+                        )
+        ) {
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
+            return;
+        }
+
         try {
-
-            String path =
-                    request.getServletPath();
-
-            // PUBLIC ROUTES
-            if (
-
-                    path.equals("/api/users/login")
-                            ||
-                            path.equals("/api/users/register")
-                            ||
-                            path.startsWith("/api/categories")
-
-            ) {
-
-                filterChain.doFilter(
-                        request,
-                        response
-                );
-
-                return;
-            }
-
-            final String authHeader =
-                    request.getHeader(
-                            "Authorization"
-                    );
-
-            // NO TOKEN
-            if (
-                    authHeader == null
-                            ||
-                            !authHeader.startsWith(
-                                    "Bearer "
-                            )
-            ) {
-
-                filterChain.doFilter(
-                        request,
-                        response
-                );
-
-                return;
-            }
 
             // EXTRACT TOKEN
             String token =
