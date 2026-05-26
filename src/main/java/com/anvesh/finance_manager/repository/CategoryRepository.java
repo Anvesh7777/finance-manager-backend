@@ -15,7 +15,7 @@ public interface CategoryRepository
     List<Category> findByUser(User user);
 
     // DEFAULT CATEGORIES
-    List<Category> findByIsDefaultCategoryTrue();
+    List<Category> findByDefaultCategoryTrue();
 
     // DUPLICATE CHECK
     Optional<Category> findByNameAndUser(
