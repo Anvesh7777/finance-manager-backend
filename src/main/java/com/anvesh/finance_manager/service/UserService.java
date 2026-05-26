@@ -36,7 +36,7 @@ public class UserService {
             User user
     ) {
 
-        // VALIDATION
+        // VALIDATE NAME
         if (
                 user.getName() == null
                         || user.getName().trim().isEmpty()
@@ -47,6 +47,7 @@ public class UserService {
             );
         }
 
+        // VALIDATE EMAIL
         if (
                 user.getEmail() == null
                         || user.getEmail().trim().isEmpty()
@@ -57,9 +58,15 @@ public class UserService {
             );
         }
 
-        if (
+        // NORMALIZE PASSWORD
+        String password =
                 user.getPassword() == null
-                        || user.getPassword().length() < 6
+                        ? ""
+                        : user.getPassword().trim();
+
+        // VALIDATE PASSWORD
+        if (
+                password.length() < 6
         ) {
 
             throw new RuntimeException(
@@ -90,7 +97,7 @@ public class UserService {
         // ENCODE PASSWORD
         user.setPassword(
                 passwordEncoder.encode(
-                        user.getPassword()
+                        password
                 )
         );
 
@@ -120,7 +127,7 @@ public class UserService {
         // PASSWORD CHECK
         if (
                 !passwordEncoder.matches(
-                        request.getPassword(),
+                        request.getPassword().trim(),
                         user.getPassword()
                 )
         ) {
