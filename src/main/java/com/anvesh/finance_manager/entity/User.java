@@ -1,13 +1,15 @@
 package com.anvesh.finance_manager.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Table(name = "users")
 @Data
+@Table(name = "users")
 public class User {
 
     @Id
@@ -16,15 +18,12 @@ public class User {
 
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Transaction> transactions;
-
-    @OneToMany(mappedBy = "user")
-    private List<Goal> goals;
 }
