@@ -1,6 +1,6 @@
 package com.anvesh.finance_manager.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -31,7 +31,9 @@ public class User {
     )
     private String email;
 
-    @JsonIgnore
+    @JsonProperty(
+            access = JsonProperty.Access.WRITE_ONLY
+    )
     @Column(
             nullable = false
     )
@@ -44,7 +46,6 @@ public class User {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    @JsonIgnore
     private List<Transaction> transactions =
             new ArrayList<>();
 }
