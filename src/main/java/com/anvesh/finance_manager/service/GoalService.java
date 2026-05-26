@@ -78,7 +78,10 @@ public class GoalService {
                 goalRepository.findByUser(currentUser);
 
         List<Transaction> transactions =
-                transactionRepository.findByUser(currentUser);
+                transactionRepository
+                        .findByUserOrderByDateDesc(
+                                currentUser
+                        );
 
         List<Map<String, Object>> response =
                 new ArrayList<>();
