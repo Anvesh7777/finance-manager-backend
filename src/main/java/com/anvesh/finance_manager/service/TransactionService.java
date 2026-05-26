@@ -2,16 +2,20 @@ package com.anvesh.finance_manager.service;
 
 import com.anvesh.finance_manager.entity.Transaction;
 import com.anvesh.finance_manager.entity.User;
+
 import com.anvesh.finance_manager.repository.TransactionRepository;
 import com.anvesh.finance_manager.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+
 import java.util.List;
 
 @Service
@@ -31,7 +35,8 @@ public class TransactionService {
                         .getContext()
                         .getAuthentication();
 
-        String email = authentication.getName();
+        String email =
+                authentication.getName();
 
         return userRepository
                 .findByEmail(email)
@@ -52,8 +57,10 @@ public class TransactionService {
                 );
 
         // FUTURE DATE VALIDATION
-        if (transaction.getDate()
-                .isAfter(indiaToday)) {
+        if (
+                transaction.getDate()
+                        .isAfter(indiaToday)
+        ) {
 
             throw new RuntimeException(
                     "Future date is not allowed"
@@ -63,7 +70,9 @@ public class TransactionService {
         User currentUser =
                 getCurrentUser();
 
-        transaction.setUser(currentUser);
+        transaction.setUser(
+                currentUser
+        );
 
         return transactionRepository
                 .save(transaction);
@@ -76,13 +85,17 @@ public class TransactionService {
                 getCurrentUser();
 
         return transactionRepository
-                .findByUser(currentUser);
+                .findByUserOrderByDateDesc(
+                        currentUser
+                );
     }
 
     // FILTER TRANSACTIONS BY DATE RANGE
-    public List<Transaction> getTransactionsByDateRange(
+    public List<Transaction>
+    getTransactionsByDateRange(
 
             LocalDate startDate,
+
             LocalDate endDate
     ) {
 
@@ -91,14 +104,19 @@ public class TransactionService {
 
         return transactionRepository
                 .findByUserAndDateBetweenOrderByDateDesc(
+
                         currentUser,
+
                         startDate,
+
                         endDate
                 );
     }
 
     // DELETE TRANSACTION
-    public void deleteTransaction(Long id) {
+    public void deleteTransaction(
+            Long id
+    ) {
 
         User currentUser =
                 getCurrentUser();
@@ -112,24 +130,28 @@ public class TransactionService {
                                 ));
 
         // SECURITY CHECK
-        if (!transaction.getUser()
-                .getId()
-                .equals(currentUser.getId())) {
+        if (
+                !transaction.getUser()
+                        .getId()
+                        .equals(
+                                currentUser.getId()
+                        )
+        ) {
 
             throw new RuntimeException(
                     "Access denied"
             );
         }
 
-        transactionRepository.delete(
-                transaction
-        );
+        transactionRepository
+                .delete(transaction);
     }
 
     // UPDATE TRANSACTION
     public Transaction updateTransaction(
 
             Long id,
+
             Transaction updatedTransaction
     ) {
 
@@ -145,9 +167,13 @@ public class TransactionService {
                                 ));
 
         // SECURITY CHECK
-        if (!transaction.getUser()
-                .getId()
-                .equals(currentUser.getId())) {
+        if (
+                !transaction.getUser()
+                        .getId()
+                        .equals(
+                                currentUser.getId()
+                        )
+        ) {
 
             throw new RuntimeException(
                     "Access denied"
@@ -160,8 +186,10 @@ public class TransactionService {
                 );
 
         // DATE VALIDATION
-        if (updatedTransaction.getDate()
-                .isAfter(indiaToday)) {
+        if (
+                updatedTransaction.getDate()
+                        .isAfter(indiaToday)
+        ) {
 
             throw new RuntimeException(
                     "Future date is not allowed"

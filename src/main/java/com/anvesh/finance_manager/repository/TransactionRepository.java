@@ -12,25 +12,27 @@ public interface TransactionRepository
         extends JpaRepository<Transaction, Long> {
 
     // USER SPECIFIC TRANSACTIONS
-    List<Transaction> findByUser(User user);
+    List<Transaction> findByUserOrderByDateDesc(
+            User user
+    );
 
     // DATE RANGE FILTER
-    List<Transaction> findByUserAndDateBetween(
+    List<Transaction>
+    findByUserAndDateBetweenOrderByDateDesc(
+
             User user,
+
             LocalDate startDate,
+
             LocalDate endDate
     );
 
     // CATEGORY FILTER
-    List<Transaction> findByUserAndCategory_Name(
-            User user,
-            String categoryName
-    );
+    List<Transaction>
+    findByUserAndCategory_Name(
 
-    // MONTHLY REPORT
-    List<Transaction> findByUserAndDateBetweenOrderByDateDesc(
             User user,
-            LocalDate startDate,
-            LocalDate endDate
+
+            String categoryName
     );
 }
