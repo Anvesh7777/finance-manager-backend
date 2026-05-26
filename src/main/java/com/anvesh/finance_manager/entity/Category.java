@@ -36,6 +36,13 @@ public class Category {
     )
     private String type;
 
+    // DEFAULT CATEGORY
+    @Column(
+            name = "is_default_category",
+            nullable = false
+    )
+    private Boolean isDefaultCategory = false;
+
     // CATEGORY OWNER
     @ManyToOne(
             fetch = FetchType.LAZY
