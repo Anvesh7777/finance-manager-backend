@@ -79,7 +79,9 @@ public class SecurityConfig {
 
                                 "/api/users/register",
 
-                                "/api/users/login"
+                                "/api/users/login",
+
+                                "/api/categories/**"
 
                         ).permitAll()
 
@@ -89,7 +91,7 @@ public class SecurityConfig {
                                 "/**"
                         ).permitAll()
 
-                        // SWAGGER / DOCS (OPTIONAL)
+                        // SWAGGER / DOCS
                         .requestMatchers(
 
                                 "/swagger-ui/**",
