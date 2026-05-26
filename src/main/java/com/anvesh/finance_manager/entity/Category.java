@@ -23,8 +23,19 @@ public class Category {
 
     private String name;
 
+    // INCOME / EXPENSE
     private String type;
 
+    // DEFAULT CATEGORY FLAG
+    private boolean defaultCategory;
+
+    // CATEGORY OWNER
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"transactions"})
+    private User user;
+
+    // TRANSACTIONS
     @OneToMany(mappedBy = "category")
     @JsonIgnore
     private List<Transaction> transactions;
