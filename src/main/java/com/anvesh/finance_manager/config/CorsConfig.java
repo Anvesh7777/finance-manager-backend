@@ -14,7 +14,8 @@ import java.util.List;
 public class CorsConfig {
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource
+    corsConfigurationSource() {
 
         CorsConfiguration configuration =
                 new CorsConfiguration();
@@ -22,19 +23,27 @@ public class CorsConfig {
         // ALLOWED FRONTENDS
         configuration.setAllowedOrigins(
                 List.of(
+
                         "http://localhost:5173",
+
                         "http://127.0.0.1:5173",
-                        "https://your-frontend-url.vercel.app"
+
+                        "https://finance-manager-frontend-murex.vercel.app"
                 )
         );
 
         // ALLOWED METHODS
         configuration.setAllowedMethods(
                 List.of(
+
                         "GET",
+
                         "POST",
+
                         "PUT",
+
                         "DELETE",
+
                         "OPTIONS"
                 )
         );
@@ -44,13 +53,15 @@ public class CorsConfig {
                 List.of("*")
         );
 
-        // EXPOSE JWT HEADER
+        // EXPOSE HEADERS
         configuration.setExposedHeaders(
                 List.of("Authorization")
         );
 
-        // ALLOW COOKIES / JWT
-        configuration.setAllowCredentials(true);
+        // ALLOW JWT / COOKIES
+        configuration.setAllowCredentials(
+                true
+        );
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
