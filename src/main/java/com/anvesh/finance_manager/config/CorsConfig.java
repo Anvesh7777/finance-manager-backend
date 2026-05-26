@@ -2,8 +2,10 @@ package com.anvesh.finance_manager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
@@ -17,13 +19,16 @@ public class CorsConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
+        // ALLOWED FRONTENDS
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
+                        "http://127.0.0.1:5173",
                         "https://your-frontend-url.vercel.app"
                 )
         );
 
+        // ALLOWED METHODS
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -34,10 +39,17 @@ public class CorsConfig {
                 )
         );
 
+        // ALLOWED HEADERS
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
+        // EXPOSE JWT HEADER
+        configuration.setExposedHeaders(
+                List.of("Authorization")
+        );
+
+        // ALLOW COOKIES / JWT
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =

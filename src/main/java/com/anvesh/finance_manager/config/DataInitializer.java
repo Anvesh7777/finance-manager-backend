@@ -17,124 +17,71 @@ public class DataInitializer {
 
         return args -> {
 
+            // ONLY INSERT IF EMPTY
             if (
                     categoryRepository.count() == 0
             ) {
 
-                Category salary =
-                        new Category();
-
-                salary.setName(
-                        "Salary"
-                );
-
-                salary.setType(
+                createCategory(
+                        categoryRepository,
+                        "Salary",
                         "INCOME"
                 );
 
-                salary.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        salary
-                );
-
-                Category freelance =
-                        new Category();
-
-                freelance.setName(
-                        "Freelance"
-                );
-
-                freelance.setType(
+                createCategory(
+                        categoryRepository,
+                        "Freelance",
                         "INCOME"
                 );
 
-                freelance.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        freelance
-                );
-
-                Category food =
-                        new Category();
-
-                food.setName(
-                        "Food"
-                );
-
-                food.setType(
+                createCategory(
+                        categoryRepository,
+                        "Food",
                         "EXPENSE"
                 );
 
-                food.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        food
-                );
-
-                Category rent =
-                        new Category();
-
-                rent.setName(
-                        "Rent"
-                );
-
-                rent.setType(
+                createCategory(
+                        categoryRepository,
+                        "Rent",
                         "EXPENSE"
                 );
 
-                rent.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        rent
-                );
-
-                Category entertainment =
-                        new Category();
-
-                entertainment.setName(
-                        "Entertainment"
-                );
-
-                entertainment.setType(
+                createCategory(
+                        categoryRepository,
+                        "Entertainment",
                         "EXPENSE"
                 );
 
-                entertainment.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        entertainment
-                );
-
-                Category transport =
-                        new Category();
-
-                transport.setName(
-                        "Transport"
-                );
-
-                transport.setType(
+                createCategory(
+                        categoryRepository,
+                        "Transport",
                         "EXPENSE"
                 );
 
-                transport.setDefaultCategory(
-                        true
-                );
-
-                categoryRepository.save(
-                        transport
+                System.out.println(
+                        "Default categories initialized successfully."
                 );
             }
         };
+    }
+
+    // HELPER METHOD
+    private void createCategory(
+
+            CategoryRepository categoryRepository,
+
+            String name,
+
+            String type
+    ) {
+
+        Category category =
+                new Category();
+
+        category.setName(name);
+
+        category.setType(type);
+
+        categoryRepository.save(category);
     }
 }

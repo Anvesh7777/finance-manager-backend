@@ -2,6 +2,7 @@ package com.anvesh.finance_manager.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -50,6 +51,7 @@ public class JwtAuthenticationFilter
                             "Authorization"
                     );
 
+            // NO TOKEN
             if (
                     authHeader == null
                             ||
@@ -66,12 +68,14 @@ public class JwtAuthenticationFilter
                 return;
             }
 
+            // EXTRACT TOKEN
             String token =
                     authHeader.substring(7);
 
             String email =
                     jwtService.extractEmail(token);
 
+            // VALIDATE USER
             if (
                     email != null
                             &&
@@ -88,6 +92,7 @@ public class JwtAuthenticationFilter
                                         email
                                 );
 
+                // VALID TOKEN
                 if (
                         jwtService.isTokenValid(
                                 token,
@@ -116,7 +121,9 @@ public class JwtAuthenticationFilter
 
                     SecurityContextHolder
                             .getContext()
-                            .setAuthentication(authToken);
+                            .setAuthentication(
+                                    authToken
+                            );
                 }
             }
 
@@ -126,8 +133,12 @@ public class JwtAuthenticationFilter
                     HttpServletResponse.SC_UNAUTHORIZED
             );
 
+            response.setContentType(
+                    "application/json"
+            );
+
             response.getWriter().write(
-                    "Invalid or Expired Token"
+                    "{\"message\":\"Invalid or Expired Token\"}"
             );
 
             return;

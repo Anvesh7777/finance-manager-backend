@@ -4,11 +4,15 @@ import com.anvesh.finance_manager.entity.Transaction;
 import com.anvesh.finance_manager.service.TransactionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.http.HttpStatus;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+
 import java.util.List;
 
 @RestController
@@ -24,6 +28,8 @@ public class TransactionController {
     public Transaction createTransaction(
             @RequestBody Transaction transaction
     ) {
+
+        validateTransaction(transaction);
 
         return transactionService
                 .createTransaction(transaction);
@@ -42,15 +48,26 @@ public class TransactionController {
     public List<Transaction> filterTransactionsByDate(
 
             @RequestParam
-            @DateTimeFormat(iso =
-                    DateTimeFormat.ISO.DATE)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
             LocalDate startDate,
 
             @RequestParam
-            @DateTimeFormat(iso =
-                    DateTimeFormat.ISO.DATE)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
             LocalDate endDate
     ) {
+
+        if (
+                startDate.isAfter(endDate)
+        ) {
+
+            throw new RuntimeException(
+                    "Start date cannot be after end date"
+            );
+        }
 
         return transactionService
                 .getTransactionsByDateRange(
@@ -80,7 +97,46 @@ public class TransactionController {
             @RequestBody Transaction transaction
     ) {
 
+        validateTransaction(transaction);
+
         return transactionService
-                .updateTransaction(id, transaction);
+                .updateTransaction(
+                        id,
+                        transaction
+                );
+    }
+
+    // VALIDATION
+    private void validateTransaction(
+            Transaction transaction
+    ) {
+
+        if (
+                transaction.getAmount() == null
+                        || transaction.getAmount() <= 0
+        ) {
+
+            throw new RuntimeException(
+                    "Amount must be greater than 0"
+            );
+        }
+
+        if (
+                transaction.getDate() == null
+        ) {
+
+            throw new RuntimeException(
+                    "Date is required"
+            );
+        }
+
+        if (
+                transaction.getCategory() == null
+        ) {
+
+            throw new RuntimeException(
+                    "Category is required"
+            );
+        }
     }
 }

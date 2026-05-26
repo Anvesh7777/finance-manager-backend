@@ -1,8 +1,10 @@
 package com.anvesh.finance_manager.service;
 
+import com.anvesh.finance_manager.entity.Category;
 import com.anvesh.finance_manager.entity.Transaction;
 import com.anvesh.finance_manager.entity.User;
 
+import com.anvesh.finance_manager.repository.CategoryRepository;
 import com.anvesh.finance_manager.repository.TransactionRepository;
 import com.anvesh.finance_manager.repository.UserRepository;
 
@@ -27,7 +29,10 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
 
-    // GET CURRENT LOGGED IN USER
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    // GET CURRENT USER
     private User getCurrentUser() {
 
         Authentication authentication =
@@ -41,22 +46,65 @@ public class TransactionService {
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() ->
+
                         new RuntimeException(
                                 "User not found"
-                        ));
+                        )
+                );
     }
 
-    // CREATE TRANSACTION
-    public Transaction createTransaction(
+    // VALIDATE TRANSACTION
+    private void validateTransaction(
             Transaction transaction
     ) {
+
+        if (
+                transaction.getAmount() == null
+                        || transaction.getAmount() <= 0
+        ) {
+
+            throw new RuntimeException(
+                    "Amount must be greater than 0"
+            );
+        }
+
+        if (
+                transaction.getDate() == null
+        ) {
+
+            throw new RuntimeException(
+                    "Transaction date is required"
+            );
+        }
+
+        if (
+                transaction.getDescription() == null
+                        || transaction.getDescription()
+                        .trim()
+                        .isEmpty()
+        ) {
+
+            throw new RuntimeException(
+                    "Description is required"
+            );
+        }
+
+        if (
+                transaction.getCategory() == null
+                        || transaction.getCategory().getId() == null
+        ) {
+
+            throw new RuntimeException(
+                    "Category is required"
+            );
+        }
 
         LocalDate indiaToday =
                 LocalDate.now(
                         ZoneId.of("Asia/Kolkata")
                 );
 
-        // FUTURE DATE VALIDATION
+        // FUTURE DATE CHECK
         if (
                 transaction.getDate()
                         .isAfter(indiaToday)
@@ -66,13 +114,35 @@ public class TransactionService {
                     "Future date is not allowed"
             );
         }
+    }
+
+    // CREATE TRANSACTION
+    public Transaction createTransaction(
+            Transaction transaction
+    ) {
+
+        validateTransaction(transaction);
 
         User currentUser =
                 getCurrentUser();
 
-        transaction.setUser(
-                currentUser
-        );
+        Category category =
+                categoryRepository
+                        .findById(
+                                transaction
+                                        .getCategory()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
+
+                                new RuntimeException(
+                                        "Category not found"
+                                )
+                        );
+
+        transaction.setUser(currentUser);
+
+        transaction.setCategory(category);
 
         return transactionRepository
                 .save(transaction);
@@ -90,7 +160,7 @@ public class TransactionService {
                 );
     }
 
-    // FILTER TRANSACTIONS BY DATE RANGE
+    // FILTER TRANSACTIONS
     public List<Transaction>
     getTransactionsByDateRange(
 
@@ -125,11 +195,13 @@ public class TransactionService {
                 transactionRepository
                         .findById(id)
                         .orElseThrow(() ->
+
                                 new RuntimeException(
                                         "Transaction not found"
-                                ));
+                                )
+                        );
 
-        // SECURITY CHECK
+        // OWNERSHIP CHECK
         if (
                 !transaction.getUser()
                         .getId()
@@ -155,6 +227,10 @@ public class TransactionService {
             Transaction updatedTransaction
     ) {
 
+        validateTransaction(
+                updatedTransaction
+        );
+
         User currentUser =
                 getCurrentUser();
 
@@ -162,11 +238,13 @@ public class TransactionService {
                 transactionRepository
                         .findById(id)
                         .orElseThrow(() ->
+
                                 new RuntimeException(
                                         "Transaction not found"
-                                ));
+                                )
+                        );
 
-        // SECURITY CHECK
+        // OWNERSHIP CHECK
         if (
                 !transaction.getUser()
                         .getId()
@@ -180,21 +258,19 @@ public class TransactionService {
             );
         }
 
-        LocalDate indiaToday =
-                LocalDate.now(
-                        ZoneId.of("Asia/Kolkata")
-                );
+        Category category =
+                categoryRepository
+                        .findById(
+                                updatedTransaction
+                                        .getCategory()
+                                        .getId()
+                        )
+                        .orElseThrow(() ->
 
-        // DATE VALIDATION
-        if (
-                updatedTransaction.getDate()
-                        .isAfter(indiaToday)
-        ) {
-
-            throw new RuntimeException(
-                    "Future date is not allowed"
-            );
-        }
+                                new RuntimeException(
+                                        "Category not found"
+                                )
+                        );
 
         transaction.setAmount(
                 updatedTransaction.getAmount()
@@ -209,7 +285,7 @@ public class TransactionService {
         );
 
         transaction.setCategory(
-                updatedTransaction.getCategory()
+                category
         );
 
         return transactionRepository

@@ -9,11 +9,14 @@ import com.anvesh.finance_manager.repository.TransactionRepository;
 import com.anvesh.finance_manager.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+
 import java.util.*;
 
 @Service
@@ -36,34 +39,88 @@ public class GoalService {
                         .getContext()
                         .getAuthentication();
 
-        String email = authentication.getName();
+        String email =
+                authentication.getName();
 
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() ->
+
                         new RuntimeException(
                                 "User not found"
-                        ));
+                        )
+                );
     }
 
     // CREATE GOAL
-    public Goal createGoal(Goal goal) {
+    public Goal createGoal(
+            Goal goal
+    ) {
 
-        if (goal.getTargetDate()
-                .isBefore(LocalDate.now())) {
+        // VALIDATION
+        if (
+                goal.getGoalName() == null
+                        || goal.getGoalName()
+                        .trim()
+                        .isEmpty()
+        ) {
+
+            throw new RuntimeException(
+                    "Goal name is required"
+            );
+        }
+
+        if (
+                goal.getTargetAmount() == null
+                        || goal.getTargetAmount() <= 0
+        ) {
+
+            throw new RuntimeException(
+                    "Target amount must be greater than 0"
+            );
+        }
+
+        if (
+                goal.getTargetDate() == null
+        ) {
+
+            throw new RuntimeException(
+                    "Target date is required"
+            );
+        }
+
+        // FUTURE DATE CHECK
+        if (
+                goal.getTargetDate()
+                        .isBefore(LocalDate.now())
+        ) {
 
             throw new RuntimeException(
                     "Target date must be future date"
             );
         }
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         goal.setUser(currentUser);
 
-        if (goal.getStartDate() == null) {
+        // AUTO START DATE
+        if (
+                goal.getStartDate() == null
+        ) {
 
-            goal.setStartDate(LocalDate.now());
+            goal.setStartDate(
+                    LocalDate.now()
+            );
+        }
+
+        // DEFAULT SAVED AMOUNT
+        if (
+                goal.getSavedAmount() == null
+        ) {
+
+            goal.setSavedAmount(0.0);
         }
 
         return goalRepository.save(goal);
@@ -72,10 +129,12 @@ public class GoalService {
     // GET ALL GOALS
     public List<Map<String, Object>> getAllGoals() {
 
-        User currentUser = getCurrentUser();
+        User currentUser =
+                getCurrentUser();
 
         List<Goal> goals =
-                goalRepository.findByUser(currentUser);
+                goalRepository
+                        .findByUser(currentUser);
 
         List<Transaction> transactions =
                 transactionRepository
@@ -86,44 +145,89 @@ public class GoalService {
         List<Map<String, Object>> response =
                 new ArrayList<>();
 
-        for (Goal goal : goals) {
+        for (
+                Goal goal : goals
+        ) {
 
             double income = 0;
+
             double expense = 0;
 
-            for (Transaction transaction : transactions) {
+            for (
+                    Transaction transaction
+                    : transactions
+            ) {
 
-                if (transaction.getDate()
-                        .isAfter(goal.getStartDate())
-                        ||
+                if (
+                        transaction.getDate() == null
+                ) {
+
+                    continue;
+                }
+
+                // ONLY AFTER GOAL START DATE
+                if (
                         transaction.getDate()
-                                .isEqual(goal.getStartDate())) {
+                                .isAfter(
+                                        goal.getStartDate()
+                                )
+                                ||
+                                transaction.getDate()
+                                        .isEqual(
+                                                goal.getStartDate()
+                                        )
+                ) {
 
-                    if (transaction.getCategory()
-                            .getType()
-                            .equalsIgnoreCase("INCOME")) {
+                    if (
+                            transaction.getCategory()
+                                    .getType()
+                                    .equalsIgnoreCase(
+                                            "INCOME"
+                                    )
+                    ) {
 
-                        income += transaction.getAmount();
+                        income +=
+                                transaction.getAmount();
 
                     } else {
 
-                        expense += transaction.getAmount();
+                        expense +=
+                                transaction.getAmount();
                     }
                 }
             }
 
-            double progress = income - expense;
+            // NET SAVINGS
+            double progress =
+                    income - expense;
 
+            // PREVENT NEGATIVE
+            progress =
+                    Math.max(progress, 0);
+
+            // LIMIT %
             double percentage =
-                    (progress / goal.getTargetAmount()) * 100;
+                    (progress /
+                            goal.getTargetAmount()) * 100;
 
+            percentage =
+                    Math.min(percentage, 100);
+
+            // REMAINING
             double remaining =
-                    goal.getTargetAmount() - progress;
+                    goal.getTargetAmount()
+                            - progress;
+
+            remaining =
+                    Math.max(remaining, 0);
 
             Map<String, Object> goalData =
                     new HashMap<>();
 
-            goalData.put("id", goal.getId());
+            goalData.put(
+                    "id",
+                    goal.getId()
+            );
 
             goalData.put(
                     "goalName",
@@ -152,16 +256,67 @@ public class GoalService {
 
             goalData.put(
                     "progressPercentage",
-                    Math.max(0, percentage)
+                    percentage
             );
 
             goalData.put(
                     "remainingAmount",
-                    Math.max(0, remaining)
+                    remaining
             );
 
             response.add(goalData);
         }
+
+        return response;
+    }
+
+    // GET GOAL BY ID
+    public Map<String, Object> getGoalById(
+            Long id
+    ) {
+
+        Goal goal =
+                goalRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+
+                                new RuntimeException(
+                                        "Goal not found"
+                                )
+                        );
+
+        Map<String, Object> response =
+                new HashMap<>();
+
+        response.put(
+                "id",
+                goal.getId()
+        );
+
+        response.put(
+                "goalName",
+                goal.getGoalName()
+        );
+
+        response.put(
+                "targetAmount",
+                goal.getTargetAmount()
+        );
+
+        response.put(
+                "savedAmount",
+                goal.getSavedAmount()
+        );
+
+        response.put(
+                "targetDate",
+                goal.getTargetDate()
+        );
+
+        response.put(
+                "startDate",
+                goal.getStartDate()
+        );
 
         return response;
     }

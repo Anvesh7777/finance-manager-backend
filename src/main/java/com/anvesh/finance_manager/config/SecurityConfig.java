@@ -29,12 +29,14 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
 
+    // PASSWORD ENCODER
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
 
         return new BCryptPasswordEncoder();
     }
 
+    // AUTH MANAGER
     @Bean
     public AuthenticationManager authenticationManager(
 
@@ -45,6 +47,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    // SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(
 
@@ -54,10 +57,21 @@ public class SecurityConfig {
 
         http
 
+                // ENABLE CORS
                 .cors(cors -> {})
 
+                // DISABLE CSRF
                 .csrf(csrf -> csrf.disable())
 
+                // SESSIONLESS JWT AUTH
+                .sessionManagement(session ->
+
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
+
+                // ROUTE AUTHORIZATION
                 .authorizeHttpRequests(auth -> auth
 
                         // PUBLIC ROUTES
@@ -69,24 +83,27 @@ public class SecurityConfig {
 
                         ).permitAll()
 
-                        // ALLOW PREFLIGHT
+                        // PREFLIGHT REQUESTS
                         .requestMatchers(
                                 HttpMethod.OPTIONS,
                                 "/**"
                         ).permitAll()
 
+                        // SWAGGER / DOCS (OPTIONAL)
+                        .requestMatchers(
+
+                                "/swagger-ui/**",
+
+                                "/v3/api-docs/**"
+
+                        ).permitAll()
+
                         // SECURED ROUTES
                         .anyRequest()
                         .authenticated()
-                )
-
-                .sessionManagement(session ->
-
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
                 );
 
+        // JWT FILTER
         http.addFilterBefore(
 
                 jwtFilter,

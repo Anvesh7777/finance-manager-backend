@@ -10,5 +10,14 @@ import java.util.List;
 public interface GoalRepository
         extends JpaRepository<Goal, Long> {
 
-    List<Goal> findByUser(User user);
+    // USER GOALS
+    List<Goal> findByUser(
+            User user
+    );
+
+    // SORTED GOALS
+    List<Goal>
+    findByUserOrderByTargetDateAsc(
+            User user
+    );
 }

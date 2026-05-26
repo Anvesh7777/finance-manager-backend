@@ -13,6 +13,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // HANDLE CUSTOM / RUNTIME ERRORS
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>>
     handleRuntimeException(RuntimeException ex) {
@@ -37,7 +38,9 @@ public class GlobalExceptionHandler {
 
         error.put(
                 "message",
-                ex.getMessage()
+                ex.getMessage() != null
+                        ? ex.getMessage()
+                        : "Something went wrong"
         );
 
         return new ResponseEntity<>(
@@ -46,6 +49,7 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // HANDLE ALL OTHER ERRORS
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>>
     handleException(Exception ex) {
@@ -70,8 +74,11 @@ public class GlobalExceptionHandler {
 
         error.put(
                 "message",
-                ex.getMessage()
+                "Server error occurred"
         );
+
+        // PRINT ACTUAL ERROR IN CONSOLE
+        ex.printStackTrace();
 
         return new ResponseEntity<>(
                 error,

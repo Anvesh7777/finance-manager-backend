@@ -10,5 +10,9 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDTO {
 
     private String message;
+
     private String token;
+
+    // OPTIONAL
+    private String tokenType = "Bearer";
 }

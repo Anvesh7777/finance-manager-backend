@@ -11,7 +11,9 @@ import com.anvesh.finance_manager.repository.UserRepository;
 import com.anvesh.finance_manager.security.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,12 +32,52 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     // REGISTER USER
-    public User registerUser(User user) {
+    public User registerUser(
+            User user
+    ) {
+
+        // VALIDATION
+        if (
+                user.getName() == null
+                        || user.getName().trim().isEmpty()
+        ) {
+
+            throw new RuntimeException(
+                    "Name is required"
+            );
+        }
 
         if (
-                userRepository
-                        .findByEmail(user.getEmail())
-                        .isPresent()
+                user.getEmail() == null
+                        || user.getEmail().trim().isEmpty()
+        ) {
+
+            throw new RuntimeException(
+                    "Email is required"
+            );
+        }
+
+        if (
+                user.getPassword() == null
+                        || user.getPassword().length() < 6
+        ) {
+
+            throw new RuntimeException(
+                    "Password must be at least 6 characters"
+            );
+        }
+
+        // NORMALIZE EMAIL
+        String email =
+                user.getEmail()
+                        .trim()
+                        .toLowerCase();
+
+        // CHECK DUPLICATE EMAIL
+        if (
+                userRepository.existsByEmail(
+                        email
+                )
         ) {
 
             throw new RuntimeException(
@@ -43,6 +85,9 @@ public class UserService {
             );
         }
 
+        user.setEmail(email);
+
+        // ENCODE PASSWORD
         user.setPassword(
                 passwordEncoder.encode(
                         user.getPassword()
@@ -57,17 +102,22 @@ public class UserService {
             LoginRequestDTO request
     ) {
 
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase();
+
         User user =
                 userRepository
-                        .findByEmail(
-                                request.getEmail()
-                        )
+                        .findByEmail(email)
                         .orElseThrow(() ->
+
                                 new RuntimeException(
-                                        "User not found"
+                                        "Invalid email or password"
                                 )
                         );
 
+        // PASSWORD CHECK
         if (
                 !passwordEncoder.matches(
                         request.getPassword(),
@@ -76,10 +126,11 @@ public class UserService {
         ) {
 
             throw new RuntimeException(
-                    "Invalid password"
+                    "Invalid email or password"
             );
         }
 
+        // GENERATE JWT
         String token =
                 jwtService.generateToken(
                         user.getEmail()
@@ -87,7 +138,8 @@ public class UserService {
 
         return new LoginResponseDTO(
                 "Login successful",
-                token
+                token,
+                "Bearer"
         );
     }
 
@@ -109,12 +161,12 @@ public class UserService {
         User user =
                 userRepository
                         .findById(id)
-                        .orElse(null);
+                        .orElseThrow(() ->
 
-        if (user == null) {
-
-            return null;
-        }
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
 
         return convertToDTO(user);
     }
@@ -127,11 +179,17 @@ public class UserService {
         UserResponseDTO dto =
                 new UserResponseDTO();
 
-        dto.setId(user.getId());
+        dto.setId(
+                user.getId()
+        );
 
-        dto.setName(user.getName());
+        dto.setName(
+                user.getName()
+        );
 
-        dto.setEmail(user.getEmail());
+        dto.setEmail(
+                user.getEmail()
+        );
 
         return dto;
     }

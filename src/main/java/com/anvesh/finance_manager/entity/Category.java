@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
-@Table(name = "category")
+@Table(name = "categories")
 @JsonIgnoreProperties({
         "hibernateLazyInitializer",
         "handler"
@@ -18,25 +20,38 @@ import java.util.List;
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
     private Long id;
 
+    @Column(
+            nullable = false
+    )
     private String name;
 
     // INCOME / EXPENSE
+    @Column(
+            nullable = false
+    )
     private String type;
 
-    // DEFAULT CATEGORY FLAG
-    private boolean defaultCategory;
-
     // CATEGORY OWNER
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"transactions"})
+    @JsonIgnoreProperties({
+            "transactions"
+    })
     private User user;
 
     // TRANSACTIONS
-    @OneToMany(mappedBy = "category")
+    @OneToMany(
+            mappedBy = "category",
+            fetch = FetchType.LAZY
+    )
     @JsonIgnore
-    private List<Transaction> transactions;
+    private List<Transaction> transactions =
+            new ArrayList<>();
 }

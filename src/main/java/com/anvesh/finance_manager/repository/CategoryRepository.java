@@ -12,14 +12,23 @@ public interface CategoryRepository
         extends JpaRepository<Category, Long> {
 
     // USER SPECIFIC CATEGORIES
-    List<Category> findByUser(User user);
-
-    // DEFAULT CATEGORIES
-    List<Category> findByDefaultCategoryTrue();
+    List<Category> findByUser(
+            User user
+    );
 
     // DUPLICATE CHECK
     Optional<Category> findByNameAndUser(
+
             String name,
+
+            User user
+    );
+
+    // EXISTS CHECK
+    boolean existsByNameIgnoreCaseAndUser(
+
+            String name,
+
             User user
     );
 }
