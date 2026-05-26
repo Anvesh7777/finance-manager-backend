@@ -77,7 +77,7 @@ public class CategoryService {
         // DEFAULT CATEGORIES
         categories.addAll(
                 categoryRepository
-                        .findByIsDefaultCategoryTrue()
+                        .findByDefaultCategoryTrue()
         );
 
         // USER CUSTOM CATEGORIES
