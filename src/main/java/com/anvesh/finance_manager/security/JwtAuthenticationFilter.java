@@ -46,6 +46,28 @@ public class JwtAuthenticationFilter
 
         try {
 
+            String path =
+                    request.getServletPath();
+
+            // PUBLIC ROUTES
+            if (
+
+                    path.equals("/api/users/login")
+                            ||
+                            path.equals("/api/users/register")
+                            ||
+                            path.startsWith("/api/categories")
+
+            ) {
+
+                filterChain.doFilter(
+                        request,
+                        response
+                );
+
+                return;
+            }
+
             final String authHeader =
                     request.getHeader(
                             "Authorization"
